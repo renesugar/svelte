@@ -11,7 +11,7 @@ import Slot from './handlers/Slot';
 import Tag from './handlers/Tag';
 import Text from './handlers/Text';
 import Title from './handlers/Title';
-import { CompileOptions } from '../../interfaces';
+import { AppendTarget, CompileOptions } from '../../interfaces';
 
 type Handler = (node: any, renderer: Renderer, options: CompileOptions) => void;
 
@@ -36,8 +36,6 @@ const handlers: Record<string, Handler> = {
 	Window: noop
 };
 
-type AppendTarget = any; // TODO
-
 export default class Renderer {
 	has_bindings = false;
 	code = '';
@@ -46,8 +44,8 @@ export default class Renderer {
 	append(code: string) {
 		if (this.targets.length) {
 			const target = this.targets[this.targets.length - 1];
-			const slotName = target.slotStack[target.slotStack.length - 1];
-			target.slots[slotName] += code;
+			const slot_name = target.slot_stack[target.slot_stack.length - 1];
+			target.slots[slot_name] += code;
 		} else {
 			this.code += code;
 		}

@@ -1,7 +1,7 @@
 {
   "name": "svelte",
-  "version": "3.0.0-beta.16",
-  "description": "The magical disappearing UI framework",
+  "version": "3.4.0",
+  "description": "Cybernetically enhanced web apps",
   "module": "index.mjs",
   "main": "index",
   "files": [
@@ -10,6 +10,7 @@
     "index.*",
     "internal.*",
     "store.*",
+    "animate.*",
     "transition.*",
     "easing.*",
     "motion.*",
@@ -26,11 +27,12 @@
     "precodecov": "npm run coverage",
     "lint": "eslint src test/*.js",
     "build": "rollup -c",
-    "prepare": "npm run build",
+    "prepare": "npm run build && npm run tsd",
     "dev": "rollup -cw",
     "pretest": "npm run build",
     "posttest": "agadoo src/internal/index.js",
-    "prepublishOnly": "export PUBLISH=true && npm run lint && npm test"
+    "prepublishOnly": "export PUBLISH=true && npm run lint && npm test",
+    "tsd": "tsc -d src/store.ts --outDir ."
   },
   "repository": {
     "type": "git",
@@ -49,6 +51,7 @@
   },
   "homepage": "https://github.com/sveltejs/svelte#README",
   "devDependencies": {
+    "@sveltejs/svelte-repl": "0.0.5",
     "@types/mocha": "^5.2.0",
     "@types/node": "^10.5.5",
     "acorn": "^6.1.1",
@@ -90,5 +93,6 @@
     ],
     "sourceMap": true,
     "instrument": true
-  }
+  },
+  "dependencies": {}
 }

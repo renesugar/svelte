@@ -1,15 +1,14 @@
-import Node from './shared/Node';
-import Block from '../render-dom/Block';
-import mapChildren from './shared/mapChildren';
+import map_children from './shared/map_children';
+import AbstractBlock from './shared/AbstractBlock';
 
-export default class PendingBlock extends Node {
-	block: Block;
-	children: Node[];
+export default class PendingBlock extends AbstractBlock {
 
 	constructor(component, parent, scope, info) {
 		super(component, parent, scope, info);
-		this.children = mapChildren(component, parent, scope, info.children);
+		this.children = map_children(component, parent, scope, info.children);
 
-		this.warnIfEmptyBlock();
+		if (!info.skip) {
+			this.warn_if_empty_block();
+		}
 	}
 }

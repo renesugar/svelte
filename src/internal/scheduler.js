@@ -1,31 +1,37 @@
 import { run_all } from './utils.js';
 import { set_current_component } from './lifecycle.js';
 
-export let dirty_components = [];
+export const dirty_components = [];
 export const intros = { enabled: false };
 
-let update_promise;
+const resolved_promise = Promise.resolve();
+let update_scheduled = false;
 const binding_callbacks = [];
 const render_callbacks = [];
+const flush_callbacks = [];
 
 export function schedule_update() {
-	if (!update_promise) {
-		update_promise = Promise.resolve();
-		update_promise.then(flush);
+	if (!update_scheduled) {
+		update_scheduled = true;
+		resolved_promise.then(flush);
 	}
+}
+
+export function tick() {
+	schedule_update();
+	return resolved_promise;
+}
+
+export function add_binding_callback(fn) {
+	binding_callbacks.push(fn);
 }
 
 export function add_render_callback(fn) {
 	render_callbacks.push(fn);
 }
 
-export function tick() {
-	schedule_update();
-	return update_promise;
-}
-
-export function add_binding_callback(fn) {
-	binding_callbacks.push(fn);
+export function add_flush_callback(fn) {
+	flush_callbacks.push(fn);
 }
 
 export function flush() {
@@ -56,7 +62,11 @@ export function flush() {
 		}
 	} while (dirty_components.length);
 
-	update_promise = null;
+	while (flush_callbacks.length) {
+		flush_callbacks.pop()();
+	}
+
+	update_scheduled = false;
 }
 
 function update($$) {

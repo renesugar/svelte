@@ -11,7 +11,7 @@ type Property = {
 	start: number;
 	end: number;
 	type: 'Property';
-	kind: string;
+	kind: 'init' | 'rest';
 	shorthand: boolean;
 	key: Identifier;
 	value: Context;
@@ -20,13 +20,13 @@ type Property = {
 type Context = {
 	start: number;
 	end: number;
-	type: 'Identifier' | 'ArrayPattern' | 'ObjectPattern';
+	type: 'Identifier' | 'ArrayPattern' | 'ObjectPattern' | 'RestIdentifier';
 	name?: string;
 	elements?: Context[];
 	properties?: Property[];
 }
 
-function errorOnAssignmentPattern(parser: Parser) {
+function error_on_assignment_pattern(parser: Parser) {
 	if (parser.eat('=')) {
 		parser.error({
 			code: 'invalid-assignment-pattern',
@@ -35,7 +35,14 @@ function errorOnAssignmentPattern(parser: Parser) {
 	}
 }
 
-export default function readContext(parser: Parser) {
+function error_on_rest_pattern_not_last(parser: Parser) {
+	parser.error({
+		code: 'rest-pattern-not-last',
+		message: 'Rest destructuring expected to be last'
+	}, parser.index);
+}
+
+export default function read_context(parser: Parser) {
 	const context: Context = {
 		start: parser.index,
 		end: null,
@@ -47,17 +54,22 @@ export default function readContext(parser: Parser) {
 		context.elements = [];
 
 		do {
-			parser.allowWhitespace();
+			parser.allow_whitespace();
+
+			const lastContext = context.elements[context.elements.length - 1];
+			if (lastContext && lastContext.type === 'RestIdentifier') {
+				error_on_rest_pattern_not_last(parser);
+			}
 
 			if (parser.template[parser.index] === ',') {
 				context.elements.push(null);
 			} else {
-				context.elements.push(readContext(parser));
-				parser.allowWhitespace();
+				context.elements.push(read_context(parser));
+				parser.allow_whitespace();
 			}
 		} while (parser.eat(','));
 
-		errorOnAssignmentPattern(parser);
+		error_on_assignment_pattern(parser);
 		parser.eat(']', true);
 		context.end = parser.index;
 	}
@@ -67,20 +79,55 @@ export default function readContext(parser: Parser) {
 		context.properties = [];
 
 		do {
-			parser.allowWhitespace();
+			parser.allow_whitespace();
+
+			if (parser.eat('...')) {
+				parser.allow_whitespace();
+
+				const start = parser.index;
+				const name = parser.read_identifier();
+				const key: Identifier = {
+					start,
+					end: parser.index,
+					type: 'Identifier',
+					name
+				}
+				const property: Property = {
+					start,
+					end: parser.index,
+					type: 'Property',
+					kind: 'rest',
+					shorthand: true,
+					key,
+					value: key
+				}
+
+				context.properties.push(property);
+
+				parser.allow_whitespace();
+
+				if (parser.eat(',')) {
+					parser.error({
+						code: `comma-after-rest`,
+						message: `Comma is not permitted after the rest element`
+					}, parser.index - 1);
+				}
+
+				break;
+			}
 
 			const start = parser.index;
-			const name = parser.readIdentifier();
+			const name = parser.read_identifier();
 			const key: Identifier = {
 				start,
 				end: parser.index,
 				type: 'Identifier',
 				name
 			};
-			parser.allowWhitespace();
+			parser.allow_whitespace();
 
 			const value = parser.eat(':')
-				? (parser.allowWhitespace(), readContext(parser))
+				? (parser.allow_whitespace(), read_context(parser))
 				: key;
 
 			const property: Property = {
@@ -95,16 +142,32 @@ export default function readContext(parser: Parser) {
 
 			context.properties.push(property);
 
-			parser.allowWhitespace();
+			parser.allow_whitespace();
 		} while (parser.eat(','));
 
-		errorOnAssignmentPattern(parser);
+		error_on_assignment_pattern(parser);
 		parser.eat('}', true);
 		context.end = parser.index;
 	}
 
+	else if (parser.eat('...')) {
+		const name = parser.read_identifier();
+		if (name) {
+			context.type = 'RestIdentifier';
+			context.end = parser.index;
+			context.name = name;
+		}
+
+		else {
+			parser.error({
+				code: 'invalid-context',
+				message: 'Expected a rest pattern'
+			});
+		}
+	}
+
 	else {
-		const name = parser.readIdentifier();
+		const name = parser.read_identifier();
 		if (name) {
 			context.type = 'Identifier';
 			context.end = parser.index;
@@ -118,7 +181,7 @@ export default function readContext(parser: Parser) {
 			});
 		}
 
-		errorOnAssignmentPattern(parser);
+		error_on_assignment_pattern(parser);
 	}
 
 	return context;

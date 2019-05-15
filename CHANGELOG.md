@@ -1,5 +1,67 @@
 # Svelte changelog
 
+## 3.4.0
+
+* Allow custom element to be defined without a `tag` ([#2417](https://github.com/sveltejs/svelte/issues/2417))
+* Fix parsing of quote marks inside attribute values ([#2715](https://github.com/sveltejs/svelte/pull/2754))
+* Convert `svelte/store` to TypeScript ([#2733](https://github.com/sveltejs/svelte/pull/2733))
+* Allow `debug` tags to include hoisted values ([#2764](https://github.com/sveltejs/svelte/issues/2764))
+* Parse error if attribute name is missing `=` ([#1513](https://github.com/sveltejs/svelte/pull/2770))
+* Allow reactive declarations to depend on mutated `const` values ([#2728](https://github.com/sveltejs/svelte/issues/2728))
+
+## 3.3.0
+
+* Allow multiple event listeners on a single node ([#2688](https://github.com/sveltejs/svelte/issues/2688))
+* Allow derivers to return a cleanup function ([#2553](https://github.com/sveltejs/svelte/issues/2553))
+* Support namespaced components (`<Foo.Bar/>`) ([#2743](https://github.com/sveltejs/svelte/pull/2743))
+
+## 3.2.2
+
+* Add `window` and `document` to expected globals ([#2722](https://github.com/sveltejs/svelte/pull/2722))
+* Prevent hoisting of functions that depend on reactive state ([#2703](https://github.com/sveltejs/svelte/pull/2703))
+* Generate correct code when slot has no changes ([#2697](https://github.com/sveltejs/svelte/issues/2697))
+* Prevent `Object.prototype`-related bugs ([#2696](https://github.com/sveltejs/svelte/pull/2696))
+
+## 3.2.1
+
+* Use same comparison logic for `derived` as for other stores ([#2644](https://github.com/sveltejs/svelte/issues/2644))
+* Invalidate dependencies of reactive declarations ([#2444](https://github.com/sveltejs/svelte/issues/2444))
+* Fix instrumentation of auto-subscription self-assignments ([#2681](https://github.com/sveltejs/svelte/issues/2681))
+* Warn on non-top-level or module-context statements labeled with `$:` ([#2176](https://github.com/sveltejs/svelte/issues/2176))
+
+## 3.2.0
+
+* Improve `spring` animations, and add `hard`/`soft` options ([#2627](https://github.com/sveltejs/svelte/pull/2627))
+* Expose `parse` and `walk` functions ([#2661](https://github.com/sveltejs/svelte/issues/2661), [#2534](https://github.com/sveltejs/svelte/pull/2534))
+* Support array/object rest in `each` block destructuring patterns ([#2647](https://github.com/sveltejs/svelte/issues/2647), [#2658](https://github.com/sveltejs/svelte/pull/2658))
+* Use `setAttribute` to change `form` property on form elements ([#1742](https://github.com/sveltejs/svelte/issues/1742))
+* Fix a11y warning when `<figcaption>` is non-direct descendant of `<figure>` ([#2582](https://github.com/sveltejs/svelte/issues/2582))
+* Squelch erroneous 'empty block' warnings ([#1716](https://github.com/sveltejs/svelte/issues/1716))
+* Fix IE9/10 error with `insertBefore` ([#2573](https://github.com/sveltejs/svelte/issues/2573))
+* Prevent `$$scope` from being spread onto an element ([#2520](https://github.com/sveltejs/svelte/issues/2520))
+* Resubscribe to stores that are assigned to in `<script>` ([#2435](https://github.com/sveltejs/svelte/issues/2435))
+* Allow reactive declarations to depend on `const` variables ([#2285](https://github.com/sveltejs/svelte/issues/2285))
+* Trigger store changes on UpdateExpression ([#2625](https://github.com/sveltejs/svelte/issues/2625))
+* Squelch missing prop warning if variable is initialised ([#2635](https://github.com/sveltejs/svelte/issues/2635))
+* Add `alert`, `confirm` and `prompt` to known globals ([#2648](https://github.com/sveltejs/svelte/issues/2648))
+
+
+## 3.1.0
+
+* Allow store subscribe functions to return an object with an `unsubscribe` method, providing native RxJS support ([#2549](https://github.com/sveltejs/svelte/issues/2549))
+
+## 3.0.1
+
+* Prevent text input cursor jumping in Safari ([#2506](https://github.com/sveltejs/svelte/issues/2506))
+* Allow assignments to member expressions ([#2510](https://github.com/sveltejs/svelte/issues/2510))
+* Prevent mutually dependent functions causing an infinite during hoisting ([#2542](https://github.com/sveltejs/svelte/issues/2542))
+* Reuse scheduler promise instead of creating new one each time ([#2555](https://github.com/sveltejs/svelte/pull/2555))
+* Various site/docs fixes
+
+## 3.0.0
+
+* Everything
+
 ## 2.15.4
 
 * IE `classList` fix ([#1868](https://github.com/sveltejs/svelte/pull/1868))
@@ -312,7 +374,7 @@
 
 ## 2.0.0
 
-*See [the blog post](https://svelte.technology/blog/version-2) for information on how to upgrade your apps*
+*See [the blog post](https://svelte.dev/blog/version-2) for information on how to upgrade your apps*
 
 * New template syntax ([#1318](https://github.com/sveltejs/svelte/issues/1318))
 * Emit ES2015 code, not ES5 ([#1348](https://github.com/sveltejs/svelte/pull/1348))

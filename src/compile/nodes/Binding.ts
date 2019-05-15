@@ -1,5 +1,5 @@
 import Node from './shared/Node';
-import getObject from '../../utils/getObject';
+import get_object from '../utils/get_object';
 import Expression from './shared/Expression';
 import Component from '../Component';
 import TemplateScope from './shared/TemplateScope';
@@ -7,7 +7,7 @@ import TemplateScope from './shared/TemplateScope';
 export default class Binding extends Node {
 	name: string;
 	expression: Expression;
-	isContextual: boolean;
+	is_contextual: boolean;
 	obj: string;
 	prop: string;
 
@@ -27,19 +27,24 @@ export default class Binding extends Node {
 		let obj;
 		let prop;
 
-		const { name } = getObject(this.expression.node);
-		this.isContextual = scope.names.has(name);
+		const { name } = get_object(this.expression.node);
+		this.is_contextual = scope.names.has(name);
 
 		// make sure we track this as a mutable ref
-		if (this.isContextual) {
-			scope.dependenciesForName.get(name).forEach(name => {
+		if (scope.is_let(name)) {
+			component.error(this, {
+				code: 'invalid-binding',
+				message: 'Cannot bind to a variable declared with the let: directive'
+			});
+		} else if (this.is_contextual) {
+			scope.dependencies_for_name.get(name).forEach(name => {
 				const variable = component.var_lookup.get(name);
 				variable[this.expression.node.type === 'MemberExpression' ? 'mutated' : 'reassigned'] = true;
 			});
 		} else {
 			const variable = component.var_lookup.get(name);
 
-			if (!variable) component.error(this.expression.node, {
+			if (!variable || variable.global) component.error(this.expression.node, {
 				code: 'binding-undeclared',
 				message: `${name} is not declared`
 			});
